@@ -1,8 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+const cors = require("cors");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 const database = {
   users: [
@@ -23,6 +27,7 @@ const database = {
       joined: new Date(),
     },
   ],
+  login: [{ id: "987", hash: "", email: "john@gmail.com" }],
 };
 
 app.get("/", (req, res) => {
@@ -30,6 +35,14 @@ app.get("/", (req, res) => {
 });
 
 app.post("/signin", (req, res) => {
+  //   bcrypt.compare(
+  //     "apples",
+  //     "$2b$10$W9i1LuTnpk295hCNCBUo1u0HIw4bQUt6lFHZmX7zGwomG7vP3ZtPS",
+  //     function (err, result) {
+  //       console.log("first guess", res);
+  //     }
+  //   );
+
   if (
     req.body.email === database.users[0].email &&
     req.body.password === database.users[0].password
@@ -42,6 +55,13 @@ app.post("/signin", (req, res) => {
 
 app.post("/register", (req, res) => {
   const { email, name, password } = req.body;
+
+  const hash = bcrypt.genSalt(saltRounds, function (err, salt) {
+    bcrypt.hash(password, salt, function (err, hash) {
+      console.log(hash);
+    });
+  });
+
   database.users.push({
     id: "125",
     name: name,
