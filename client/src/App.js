@@ -5,6 +5,7 @@ import ParticlesBg from "particles-bg";
 import { Component } from "react";
 import SignIn from "./components/SignIn/SignIn";
 import Register from "./components/Register/Register";
+import ListHeader from "./components/ToDoList/ListHeader";
 
 class App extends Component {
   constructor() {
@@ -61,6 +62,7 @@ class App extends Component {
         {route === "home" ? (
           <div>
             <Logo />
+            <ListHeader listName={"Holiday Tick List"} />
           </div>
         ) : route === "signin" ? (
           <SignIn loadUser={this.loadUser} onRouteChange={this.onRouteChange} />

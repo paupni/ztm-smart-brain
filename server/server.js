@@ -1,12 +1,24 @@
+const PORT = process.env.PORT ?? 8000;
 const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const cors = require("cors");
+const pool = require("./db");
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+// todo requests
+app.get("/todos", async (req, res) => {
+  try {
+    const todos = await pool.query("SELECT * FROM todos");
+    res.json(todos.rows);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
 const database = {
   users: [
@@ -84,6 +96,6 @@ app.get("/profile/:id", (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("app is running on port 3000");
+app.listen(PORT, () => {
+  console.log(`Server is running on PORT ${PORT}`);
 });
