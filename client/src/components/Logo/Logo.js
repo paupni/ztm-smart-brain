@@ -5,7 +5,7 @@ import "./Logo.css";
 
 const Logo = () => {
   return (
-    <div className="ma4 mt0">
+    <div className="ma3 mt3">
       <Tilt
         className="Tilt br2 shadow-2"
         tiltMaxAngleX="50"

@@ -11,9 +11,13 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // todo requests
-app.get("/todos", async (req, res) => {
+app.get("/todos/:userEmail", async (req, res) => {
+  const { userEmail } = req.params;
   try {
-    const todos = await pool.query("SELECT * FROM todos");
+    const todos = await pool.query(
+      "SELECT * FROM todos WHERE user_email = $1",
+      [userEmail]
+    );
     res.json(todos.rows);
   } catch (error) {
     console.error(error);
@@ -21,23 +25,26 @@ app.get("/todos", async (req, res) => {
 });
 
 const database = {
-  users: [
+  todos: [
     {
-      id: "123",
-      name: "John",
-      email: "john@gmail.com",
-      password: "cookies",
-      joined: new Date(),
+      id: "0",
+      user_email: "paula@gmail.com",
+      title: "First todo",
+      progress: 10,
+      date: "123",
     },
     {
-      id: "124",
-      name: "Sally",
-      email: "sally@gmail.com",
-      password: "bananas",
-      joined: new Date(),
+      id: "1",
+      user_email: "ania@gmail.com",
+      title: "First todo",
+      progress: 10,
+      date: "123",
     },
   ],
-  login: [{ id: "987", hash: "", email: "john@gmail.com" }],
+  users: [
+    { email: "paula@gmail.com", hashed_password: "cookies" },
+    { email: "ania@gmail.com", hashed_password: "123" },
+  ],
 };
 
 app.get("/", (req, res) => {
@@ -55,7 +62,7 @@ app.post("/signin", (req, res) => {
 
   if (
     req.body.email === database.users[0].email &&
-    req.body.password === database.users[0].password
+    req.body.hashed_password === database.users[0].hashed_password
   ) {
     res.json(database.users[0]);
   } else {
@@ -64,7 +71,7 @@ app.post("/signin", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, hashed_password } = req.body;
 
   const hash = bcrypt.genSalt(saltRounds, function (err, salt) {
     bcrypt.hash(password, salt, function (err, hash) {
@@ -74,10 +81,8 @@ app.post("/register", (req, res) => {
 
   database.users.push({
     id: "125",
-    name: name,
     email: email,
     password: password,
-    joined: new Date(),
   });
   res.json(database.users[database.users.length - 1]);
 });

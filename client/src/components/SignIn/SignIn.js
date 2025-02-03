@@ -1,7 +1,5 @@
 import React from "react";
 
-// } ({ onRouteChange }) => {
-
 class SignIn extends React.Component {
   constructor(props) {
     super(props);
@@ -23,7 +21,7 @@ class SignIn extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: this.state.signInEmail,
-        password: this.state.signInPassword,
+        hashed_password: this.state.signInPassword,
       }),
     })
       .then((response) => response.json())
