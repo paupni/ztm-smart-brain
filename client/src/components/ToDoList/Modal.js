@@ -1,34 +1,69 @@
 import React from "react";
 import { useState } from "react";
 
-const Modal = ({ mode, setShowModal }) => {
+const Modal = ({ mode, setShowModal, getData, todo }) => {
   const editMode = mode === "edit" ? true : false;
   const [data, setData] = useState({
-    user_email: "",
-    title: "",
-    progress: "",
-    date: editMode ? "" : new Date(),
+    user_email: editMode ? todo.user_email : "paula@gmail.com",
+    title: editMode ? todo.title : "",
+    progress: editMode ? todo.progress : 50,
+    date: editMode ? TextTrackList.date : new Date(),
   });
 
+  const postData = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:8000/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (response.status === 200) {
+        console.log("worked");
+        setShowModal(false);
+        getData();
+      }
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const editData = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:8000/todos/${todo.id}`, {
+        method: "PUT",
+        headers: { "COntent-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (response.status === 200) {
+        setShowModal(false);
+        getData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleChange = (e) => {
-    console.log("changing", e);
     const { name, value } = e.target;
 
     setData((date) => ({
       ...data,
       [name]: value,
     }));
-
-    console.log(data);
   };
+
   return (
     <div
       className=""
       style={{
         position: "absolute",
         zIndex: 1000,
-        // left: 0,
-        // top: 0,
+        left: 0,
+        top: 180,
         width: "100vw",
         display: "flex",
         justifyContent: "center",
@@ -86,6 +121,7 @@ const Modal = ({ mode, setShowModal }) => {
           <input
             className="b mr4 ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
             type="submit"
+            onClick={editMode ? editData : postData}
           ></input>
         </form>
       </div>

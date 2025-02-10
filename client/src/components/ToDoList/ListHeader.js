@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
 
-const ListHeader = ({ listName }) => {
+const ListHeader = ({ listName, getData }) => {
   const [showModal, setShowModal] = useState(false);
   // onNameChange = (event) => {
   //   this.setState({ name: event.target.value });
   // };
 
   return (
-    <div>
+    <div className="pa4 center">
       {/* <input
         className="pa2 input-reset ba bg-transparent hover-bg-black w-100"
         type="text"
@@ -28,7 +28,9 @@ const ListHeader = ({ listName }) => {
         Sign out
       </button>
 
-      {showModal && <Modal mode={"create"} setShowModal={setShowModal} />}
+      {showModal && (
+        <Modal mode={"create"} setShowModal={setShowModal} getData={getData} />
+      )}
     </div>
   );
 };

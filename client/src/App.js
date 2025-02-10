@@ -12,7 +12,7 @@ const App = () => {
   const userEmail = "paula@gmail.com";
   const [todos, setTodos] = useState(null);
 
-  const fetchData = async () => {
+  const getData = async () => {
     try {
       const response = await fetch(`http://localhost:8000/todos/${userEmail}`);
       const data = await response.json();
@@ -22,18 +22,20 @@ const App = () => {
     }
   };
 
-  useEffect(() => fetchData, []);
+  useEffect(() => getData, []);
 
   // const sortedTodos = todos.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="App">
       {/* <ParticlesBg type="circle" bg={true} /> */}
-      <div>
+      <div style={{ display: "flex" }}>
         <Logo />
-        <ListHeader listName={"Holiday Tick List"} />
+        <ListHeader listName={"Holiday Tick List"} getData={getData} />
+      </div>
+      <div>
         {todos?.map((todo) => (
-          <ListItem key={todo.id} todo={todo} />
+          <ListItem key={todo.id} todo={todo} getData={getData} />
         ))}
       </div>
     </div>
