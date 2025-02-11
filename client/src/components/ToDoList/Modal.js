@@ -1,13 +1,16 @@
 import React from "react";
 import { useState } from "react";
+import { useCookies } from "react-cookie";
 
 const Modal = ({ mode, setShowModal, getData, todo }) => {
+  const [cookies, setCookie, removeCookie] = useCookies(null);
   const editMode = mode === "edit" ? true : false;
+
   const [data, setData] = useState({
-    user_email: editMode ? todo.user_email : "paula@gmail.com",
+    user_email: editMode ? todo.user_email : cookies.Email,
     title: editMode ? todo.title : "",
     progress: editMode ? todo.progress : 50,
-    date: editMode ? TextTrackList.date : new Date(),
+    date: editMode ? todo.date : new Date(),
   });
 
   const postData = async (e) => {
@@ -40,7 +43,7 @@ const Modal = ({ mode, setShowModal, getData, todo }) => {
         `${process.env.REACT_APP_SERVER_URL}/todos/${todo.id}`,
         {
           method: "PUT",
-          headers: { "COntent-Type": "application/json" },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         }
       );

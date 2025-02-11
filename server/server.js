@@ -2,10 +2,10 @@ const PORT = process.env.PORT ?? 8000;
 const express = require("express");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
-const saltRounds = 10;
 const cors = require("cors");
 const pool = require("./db");
 const { v4: uuidv4 } = require("uuid");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 app.use(bodyParser.json());
@@ -29,7 +29,6 @@ app.get("/todos/:userEmail", async (req, res) => {
 // create new todo
 app.post("/todos", async (req, res) => {
   const { user_email, title, progress, date } = req.body;
-  console.log(user_email, title, progress, date);
 
   const id = uuidv4();
   try {
@@ -71,82 +70,54 @@ app.delete("/todos/:id", async (req, res) => {
   }
 });
 
-const database = {
-  todos: [
-    {
-      id: "0",
-      user_email: "paula@gmail.com",
-      title: "First todo",
-      progress: 10,
-      date: "123",
-    },
-    {
-      id: "1",
-      user_email: "ania@gmail.com",
-      title: "First todo",
-      progress: 10,
-      date: "123",
-    },
-  ],
-  users: [
-    { email: "paula@gmail.com", hashed_password: "cookies" },
-    { email: "ania@gmail.com", hashed_password: "123" },
-  ],
-};
+// signup
+app.post("/signup", async (req, res) => {
+  const { email, password } = req.body;
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+  try {
+    const signUp = await pool.query(
+      `INSERT INTO users (email, hashed_password) VALUES ($1, $2)`,
+      [email, hashedPassword]
+    );
+    const token = jwt.sign({ email }, "secret", { expiresIn: "1hr" });
 
-// app.get("/", (req, res) => {
-//   res.send(database.users);
-// });
+    res.json({ email, token });
+  } catch (error) {
+    console.log(error);
+    if (error) {
+      res.json({ detail: error.detail });
+    }
+  }
+});
 
-// app.post("/signin", (req, res) => {
-//   //   bcrypt.compare(
-//   //     "apples",
-//   //     "$2b$10$W9i1LuTnpk295hCNCBUo1u0HIw4bQUt6lFHZmX7zGwomG7vP3ZtPS",
-//   //     function (err, result) {
-//   //       console.log("first guess", res);
-//   //     }
-//   //   );
+/// login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const users = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
 
-//   if (
-//     req.body.email === database.users[0].email &&
-//     req.body.hashed_password === database.users[0].hashed_password
-//   ) {
-//     res.json(database.users[0]);
-//   } else {
-//     res.status(400).json("error logging in");
-//   }
-// });
+    if (!users.rows.length) {
+      return res.json({ detail: "User does not exist" });
+    }
 
-// app.post("/register", (req, res) => {
-//   const { email, hashed_password } = req.body;
+    const success = await bcrypt.compare(
+      password,
+      users.rows[0].hashed_password
+    );
+    const token = jwt.sign({ email }, "secret", { expiresIn: "1hr" });
 
-//   const hash = bcrypt.genSalt(saltRounds, function (err, salt) {
-//     bcrypt.hash(password, salt, function (err, hash) {
-//       // console.log(hash);
-//     });
-//   });
-
-//   database.users.push({
-//     id: "125",
-//     email: email,
-//     password: password,
-//   });
-//   res.json(database.users[database.users.length - 1]);
-// });
-
-// app.get("/profile/:id", (req, res) => {
-//   const { id } = req.params;
-//   let found = false;
-//   database.users.forEach((user) => {
-//     if (user.id === id) {
-//       found = true;
-//       return res.json(user);
-//     }
-//   });
-//   if (!found) {
-//     res.status(400).json("not found");
-//   }
-// });
+    if (success) {
+      res.json({ email: users.rows[0].email, token });
+    } else {
+      res.json({ detail: "Login failed" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on PORT ${PORT}`);

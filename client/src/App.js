@@ -1,17 +1,16 @@
 import "./App.css";
-import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
-import ParticlesBg from "particles-bg";
-import { Component, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ListHeader from "./components/ToDoList/ListHeader";
 import ListItem from "./components/ToDoList/ListItem";
 import Auth from "./components/Auth/Auth";
+import { useCookies } from "react-cookie";
 
 const App = () => {
-  const userEmail = "paula@gmail.com";
+  const [cookies, setCookie, removeCookie] = useCookies(null);
+  const authToken = cookies.AuthToken;
+  const userEmail = cookies.Email;
   const [todos, setTodos] = useState(null);
-
-  const authToken = false;
 
   const getData = async () => {
     try {
@@ -31,7 +30,9 @@ const App = () => {
     }
   }, []);
 
-  // const sortedTodos = todos.sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedTodos = todos?.sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
 
   return (
     <div className="App">
@@ -41,9 +42,10 @@ const App = () => {
           <div style={{ display: "flex" }}>
             <Logo />
             <ListHeader listName={"Holiday Tick List"} getData={getData} />
+            <p>Welcome back {userEmail}</p>
           </div>
           <div>
-            {todos?.map((todo) => (
+            {sortedTodos?.map((todo) => (
               <ListItem key={todo.id} todo={todo} getData={getData} />
             ))}
           </div>
