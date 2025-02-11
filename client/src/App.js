@@ -7,14 +7,19 @@ import SignIn from "./components/SignIn/SignIn";
 import Register from "./components/Register/Register";
 import ListHeader from "./components/ToDoList/ListHeader";
 import ListItem from "./components/ToDoList/ListItem";
+import Auth from "./components/Auth/Auth";
 
 const App = () => {
   const userEmail = "paula@gmail.com";
   const [todos, setTodos] = useState(null);
 
+  const authToken = false;
+
   const getData = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/todos/${userEmail}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/todos/${userEmail}`
+      );
       const data = await response.json();
       setTodos(data);
     } catch (error) {
@@ -29,15 +34,20 @@ const App = () => {
   return (
     <div className="App">
       {/* <ParticlesBg type="circle" bg={true} /> */}
-      <div style={{ display: "flex" }}>
-        <Logo />
-        <ListHeader listName={"Holiday Tick List"} getData={getData} />
-      </div>
-      <div>
-        {todos?.map((todo) => (
-          <ListItem key={todo.id} todo={todo} getData={getData} />
-        ))}
-      </div>
+      {!authToken && <Auth />}
+      {authToken && (
+        <div>
+          <div style={{ display: "flex" }}>
+            <Logo />
+            <ListHeader listName={"Holiday Tick List"} getData={getData} />
+          </div>
+          <div>
+            {todos?.map((todo) => (
+              <ListItem key={todo.id} todo={todo} getData={getData} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

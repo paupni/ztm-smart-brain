@@ -8,9 +8,12 @@ const ListItem = ({ todo, getData }) => {
 
   const deleteItem = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/todos/${todo.id}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_SERVER_URL}/todos/${todo.id}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (response.status === 200) {
         getData();
       }
