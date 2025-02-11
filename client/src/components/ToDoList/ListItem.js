@@ -6,6 +6,19 @@ import Modal from "./Modal";
 const ListItem = ({ todo, getData }) => {
   const [showModal, setShowModal] = useState(false);
 
+  const deleteItem = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/todos/${todo.id}`, {
+        method: "DELETE",
+      });
+      if (response.status === 200) {
+        getData();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <li className="ph5-ns pv2 list pl0">
       <div className="mw8 center br2 ba b--light-blue bg-light-blue">
@@ -24,7 +37,7 @@ const ListItem = ({ todo, getData }) => {
             </button>
             <button
               className="b mr4 ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
-              onClick={() => setShowModal(true)}
+              onClick={deleteItem}
             >
               Delete
             </button>
