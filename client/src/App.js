@@ -3,8 +3,6 @@ import Navigation from "./components/Navigation/Navigation";
 import Logo from "./components/Logo/Logo";
 import ParticlesBg from "particles-bg";
 import { Component, useEffect, useState } from "react";
-import SignIn from "./components/SignIn/SignIn";
-import Register from "./components/Register/Register";
 import ListHeader from "./components/ToDoList/ListHeader";
 import ListItem from "./components/ToDoList/ListItem";
 import Auth from "./components/Auth/Auth";
@@ -27,13 +25,16 @@ const App = () => {
     }
   };
 
-  useEffect(() => getData, []);
+  useEffect(() => {
+    if (authToken) {
+      getData();
+    }
+  }, []);
 
   // const sortedTodos = todos.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   return (
     <div className="App">
-      {/* <ParticlesBg type="circle" bg={true} /> */}
       {!authToken && <Auth />}
       {authToken && (
         <div>
