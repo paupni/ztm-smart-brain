@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import Modal from "./Modal";
+import { useCookies } from "react-cookie";
 
 const ListHeader = ({ listName, getData }) => {
   const [showModal, setShowModal] = useState(false);
+  const [cookies, setCookie, removeCookie] = useCookies(null);
+  const authToken = cookies.AuthToken;
+
+  const handleSignOut = () => {
+    removeCookie("AuthToken", "Email", { path: "/" });
+    window.location.reload();
+  };
 
   return (
     <div className="pa4 center">
@@ -14,7 +22,10 @@ const ListHeader = ({ listName, getData }) => {
         Add new
       </button>
 
-      <button className="b mr4 ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib">
+      <button
+        className="b mr4 ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
+        onClick={handleSignOut}
+      >
         Sign out
       </button>
 

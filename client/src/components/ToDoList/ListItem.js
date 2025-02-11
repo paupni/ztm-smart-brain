@@ -29,7 +29,7 @@ const ListItem = ({ todo, getData }) => {
           <TickIcon />
           <div className="pa3 pa4-ns dtc-ns v-mid">
             <h3 className="">{todo.title}</h3>
-            <ProgressBar />
+            <ProgressBar progress={todo.progress} />
           </div>
           <div className="pa3 pa4-ns dtc-ns v-mid">
             <button
